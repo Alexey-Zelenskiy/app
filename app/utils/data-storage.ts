@@ -1,34 +1,16 @@
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default class DataStorage {
-  private static REFRESH_TOKEN_STORAGE_KEY: string = '@refresh_token';
-  private static ACCESS_TOKEN_STORAGE_KEY: string = '@access_token';
+  private static MY_SUBSCRIPTION: string = '@my_subscription';
 
-  static async storeRefreshToken(refreshToken: string): Promise<boolean> {
-    return DataStorage.storeItem(this.REFRESH_TOKEN_STORAGE_KEY, refreshToken);
+  static async storeMySubscription(data: any){
+    return DataStorage.storeItem(this.MY_SUBSCRIPTION, data);
+  }
+  static async getMySubscription(): Promise<string | null> {
+    return DataStorage.getItem(DataStorage.MY_SUBSCRIPTION);
   }
 
-  static async storeAccessToken(accessToken: string): Promise<boolean> {
-    return DataStorage.storeItem(this.ACCESS_TOKEN_STORAGE_KEY, accessToken);
-  }
-
-  static async getAccessToken(): Promise<string | null> {
-    return DataStorage.getItem(DataStorage.ACCESS_TOKEN_STORAGE_KEY);
-  }
-
-  static async getRefreshToken(): Promise<string | null> {
-    return DataStorage.getItem(DataStorage.REFRESH_TOKEN_STORAGE_KEY);
-  }
-
-  static async removeAccessToken(): Promise<boolean> {
-    return DataStorage.removeItem(DataStorage.ACCESS_TOKEN_STORAGE_KEY);
-  }
-
-  static async removeRefreshToken(): Promise<boolean> {
-    return DataStorage.removeItem(DataStorage.ACCESS_TOKEN_STORAGE_KEY);
-  }
-
-  static async storeItem(key: string, item: string | object): Promise<boolean> {
+  static async storeItem(key: string, item: string | object | any) {
     try {
       await AsyncStorage.setItem(
         key,
@@ -40,7 +22,7 @@ export default class DataStorage {
     }
   }
 
-  static async getItem(key: string): Promise<string | null> {
+  static async getItem(key: string) {
     try {
       return await AsyncStorage.getItem(key);
     } catch (err) {

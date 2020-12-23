@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import {observer} from 'mobx-react-lite';
 import {
   NavigationContainer,
@@ -27,6 +27,9 @@ import SubscriptionsComponent from '../../screens/subscriptions-screen/subscript
 import {Text} from 'react-native';
 import Icon from '../../components/icon/icon.component';
 import NewSubscriptionComponent from '../../screens/new-subscription-screen';
+import DataStorage from '../../utils/data-storage';
+import {useStore} from '../../store';
+import AsyncStorage from "@react-native-community/async-storage";
 
 // Types
 export type RootStackParamList = {
@@ -103,19 +106,23 @@ interface RootStackNavigatorProps {}
 
 const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
   // const [initialized, setInitialized] = useState(false);
-  // const store = useStore();
+  const store = useStore();
+
+  useLayoutEffect(() => {
+    RNBootSplash.show();
+    const getMySubscriptions = async () => {
+      const data = await DataStorage.getItem('@my_subscriptions');
+      if (data) {
+        store.app.setMySubscriptions(JSON.parse(data));
+        RNBootSplash.hide({duration: 500});
+      }
+    };
+    getMySubscriptions().then();
+  }, [store.app]);
   const navigatorRef = useRef<NavigationContainerRef | null>(null);
   // const navigate = useCallback((name: string, params?: any) => {
   //   navigatorRef.current?.navigate(name, params);
   // }, []);
-
-  // useEffect(() => {
-  //   RNBootSplash.show();
-  //   store.auth.signInWithSavedToken().then(() => {
-  //     setInitialized(true);
-  //     RNBootSplash.hide({duration: 500});
-  //   });
-  // }, [store.auth]);
 
   // if (!initialized) {
   //   return null;
@@ -129,7 +136,15 @@ const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
             name="Home"
             component={HomeTabNavigator}
             options={{
-              headerShown: false,
+              headerShown: true,
+              title: 'Мои подписки',
+              headerStyle: {
+                backgroundColor: theme.colors.brandDark,
+              },
+              headerTitleStyle: {
+                color: theme.colors.brandWhite,
+              },
+              headerTintColor: theme.colors.brandWhite,
             }}
           />
           <RootStack.Screen

@@ -18,6 +18,7 @@ const SubscriptionView = styled.View`
   align-items: center;
   margin-bottom: 10px;
   flex-direction: row;
+  padding: 10px;
 `;
 
 export const styles = StyleSheet.create({
@@ -25,6 +26,13 @@ export const styles = StyleSheet.create({
     right: '5%',
     top: 5,
     color: theme.colors.brandWhite,
+    position: 'absolute',
+  },
+  titleDate: {
+    right: '5%',
+    top: 50,
+    color: theme.colors.brandWhite,
+    fontSize: 15,
     position: 'absolute',
   },
   dateInput: {

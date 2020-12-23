@@ -78,7 +78,7 @@ const SubscriptionsComponent: React.FC<SubscriptionsScreenProps> = ({
         <S.ViewTitle>{item.title}</S.ViewTitle>
       </S.View>
     ),
-    [],
+    [newSubscription],
   );
 
   const subscriptionsSearch = () => {
@@ -107,7 +107,7 @@ const SubscriptionsComponent: React.FC<SubscriptionsScreenProps> = ({
           size={45}
           style={{
             position: 'absolute',
-            bottom: 50,
+            bottom: 25,
             backgroundColor: '#04bb65',
             marginLeft: '80%',
           }}
