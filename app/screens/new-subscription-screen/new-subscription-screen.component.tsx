@@ -39,8 +39,8 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
     setShowDate(false);
   };
 
-  const addSubscription = useCallback(() => {
-    store.app.updateMySubscriptions({
+  const addSubscription = useCallback(async () => {
+    await store.app.updateMySubscriptions({
       id: (Math.random().toString(16) + '00000000000000000').slice(2, 12 + 2),
       title: name,
       description: description,
@@ -92,7 +92,14 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
               style={{color: theme.colors.brandWhite, marginRight: 'auto'}}>
               {name || subscriptionData.title}
             </Title>
-            <Title style={styles.titleSum}>{sum || 0}$</Title>
+            {sum.length > 0 ? (
+              <>
+                <Title style={styles.titleSum}>
+                  {sum}
+                  {currency || store.common.defaultCurrency}
+                </Title>
+              </>
+            ) : null}
             <Title style={styles.titleDate}>{moment(date).fromNow()}</Title>
           </S.SubscriptionView>
           <S.Input
@@ -129,9 +136,9 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
             }}
             onValueChange={(value) => setCurrency({value})}
             items={[
-              {label: 'Российский рубль', value: 'Российский рубль'},
-              {label: 'Доллар США', value: 'Доллар США'},
-              {label: 'Евро', value: 'Евро'},
+              {label: 'Российский рубль', value: '₽'},
+              {label: 'Доллар США', value: '$'},
+              {label: 'Евро', value: '€'},
             ]}
           />
           <S.Input
