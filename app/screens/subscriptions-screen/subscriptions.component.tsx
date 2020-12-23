@@ -8,6 +8,7 @@ import {useStore} from '../../store';
 import {SubscriptionsScreenProps} from '../../navigators/root-stack-navigator/root-stack-navigator.component';
 import Icon from '../../components/icon/icon.component';
 import theme from '../../styles/theme';
+import {Colors, IconButton} from 'react-native-paper';
 
 const SubscriptionsComponent: React.FC<SubscriptionsScreenProps> = ({
   navigation,
@@ -18,6 +19,11 @@ const SubscriptionsComponent: React.FC<SubscriptionsScreenProps> = ({
     },
     [navigation],
   );
+
+  const createSubscription = useCallback(() => {
+    navigation.navigate('NewSubscription');
+  }, [navigation]);
+
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
   useLayoutEffect(() => {
@@ -94,6 +100,18 @@ const SubscriptionsComponent: React.FC<SubscriptionsScreenProps> = ({
           data={subscriptionsSearch()}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
+        />
+        <IconButton
+          icon="calendar-plus"
+          color={Colors.white}
+          size={45}
+          style={{
+            position: 'absolute',
+            bottom: 50,
+            backgroundColor: '#04bb65',
+            marginLeft: '80%',
+          }}
+          onPress={createSubscription}
         />
       </S.Container>
     </GS.SafeAreaView>

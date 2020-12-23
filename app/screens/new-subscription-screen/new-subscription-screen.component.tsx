@@ -80,7 +80,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
             onPress={() => setShowDate(true)}>
             <Text>{date}</Text>
           </TouchableOpacity>
-          {showDate && (
+          {/* {showDate && (
             <DateTimePicker
               testID="dateTimePicker"
               value={new Date()}
@@ -89,7 +89,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
               display="default"
               onChange={onChangeDate}
             />
-          )}
+          )} */}
           <S.Input value={'s'} placeholder={'Введите название'} />
         </S.Container>
       </ScrollView>
