@@ -43,6 +43,25 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
       setShowDate(false);
     };
 
+    const renderDate = useCallback(() => {
+      switch (reminder) {
+        case 'За день':
+          return new Date().getDate() - 1;
+        case 'За два дня':
+          return new Date().getDate() - 2;
+        case 'За три дня':
+          return new Date().getDate() - 3;
+        case 'За неделю':
+          return new Date().getDate() - 7;
+        case 'За две недели':
+          return new Date().getDate() - 14;
+        case 'За месяц':
+          return new Date().getDate() - 30;
+        default:
+          return new Date().getDate() - 1;
+      }
+    }, [reminder]);
+
     const addSubscription = useCallback(async () => {
       await store.app.addMySubscriptions({
         id: (Math.random().toString(16) + '00000000000000000').slice(2, 12 + 2),
@@ -56,9 +75,10 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
         frequency: frequency,
         favorite: favorite,
       });
-      PushNotification.localNotification({
-        message: name,
-        title: 'sssss',
+      PushNotification.localNotificationSchedule({
+        message: `Оплатить ${name} - ${sum}`,
+        title: name,
+        date: new Date(renderDate()),
       });
       navigation.navigate('Home');
     }, [
@@ -72,6 +92,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
       color,
       frequency,
       favorite,
+      renderDate,
       navigation,
     ]);
     useLayoutEffect(() => {

@@ -47,7 +47,7 @@ const SettingsScreen = observer(() => {
             onDismiss={hideModal}
             contentContainerStyle={containerStyle}>
             <Text style={{marginBottom: 5}}>
-              Нажмите на круг чтобы выбрать цвет.
+              Нажмите на линию чтобы выбрать цвет.
             </Text>
             <Text>Верхняя/нижняя панель</Text>
             <TriangleColorPicker

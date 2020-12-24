@@ -14,6 +14,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import {Modal, Portal} from 'react-native-paper';
 import {ColorPicker} from 'react-native-color-picker';
 import {observer} from 'mobx-react-lite';
+import PushNotification from 'react-native-push-notification';
 
 const CreateScreenComponent: React.FC<CreateScreenProps> = observer(
   ({navigation}) => {
@@ -45,7 +46,24 @@ const CreateScreenComponent: React.FC<CreateScreenProps> = observer(
       setDate(currentDate);
       setShowDate(false);
     };
-
+    const renderDate = useCallback(() => {
+      switch (reminder) {
+        case 'За день':
+          return new Date().getDate() - 1;
+        case 'За два дня':
+          return new Date().getDate() - 2;
+        case 'За три дня':
+          return new Date().getDate() - 3;
+        case 'За неделю':
+          return new Date().getDate() - 7;
+        case 'За две недели':
+          return new Date().getDate() - 14;
+        case 'За месяц':
+          return new Date().getDate() - 30;
+        default:
+          return new Date().getDate() - 1;
+      }
+    }, [reminder]);
     const addSubscription = useCallback(async () => {
       await store.app.addMySubscriptions({
         id: (Math.random().toString(16) + '00000000000000000').slice(2, 12 + 2),
@@ -59,6 +77,11 @@ const CreateScreenComponent: React.FC<CreateScreenProps> = observer(
         frequency: frequency,
         favorite: favorite,
       });
+      PushNotification.localNotificationSchedule({
+        message: `Оплатить ${name} - ${sum}`,
+        title: name,
+        date: new Date(renderDate()),
+      });
       navigation.navigate('Home');
     }, [
       store.app,
@@ -70,8 +93,9 @@ const CreateScreenComponent: React.FC<CreateScreenProps> = observer(
       reminder,
       color,
       frequency,
-      navigation,
       favorite,
+      renderDate,
+      navigation,
     ]);
 
     useLayoutEffect(() => {
