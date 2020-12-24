@@ -21,9 +21,15 @@ const DashboardScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
     navigation.navigate('Subscriptions');
   }, [navigation]);
 
+  const goToEdit = useCallback(
+    (idx: number) => {
+      navigation.navigate('Edit', {id: idx});
+    },
+    [navigation],
+  );
+
   const store = useStore();
 
-  console.log(store.app.mySubscriptions);
   const listRef = useRef<FlatList>(null);
   const listOffset = useRef<number | null>(null);
   const handleScroll = (e: any) => {
@@ -40,10 +46,17 @@ const DashboardScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
   };
   const keyExtractor = useCallback((item) => `${item.id}`, []);
   const renderItem = useCallback(
-    ({item}) => (
-      <S.View style={{backgroundColor: item.color}}>
+    ({item, index}) => (
+      <S.View
+        style={{backgroundColor: item.color}}
+        onPress={() => goToEdit(index)}>
         <S.ViewTitle>{item.title}</S.ViewTitle>
-        <Title style={styles.title}>Платёж {moment(item.date).fromNow()}</Title>
+        <Title style={styles.title}>
+          Платёж{' '}
+          {moment(item.date).fromNow() === 'несколько секунд назад'
+            ? 'сегодня'
+            : moment(item.date).fromNow()}
+        </Title>
         <Title style={styles.titleSum}>
           {item.sum}$ - {item.frequency}
         </Title>

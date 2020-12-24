@@ -6,7 +6,7 @@ import S, {styles} from './new-subscription-screen.styled';
 import {useStore} from '../../store';
 import {Title} from 'react-native-paper';
 import theme from '../../styles/theme';
-import {ScrollView, Text, TouchableOpacity} from 'react-native';
+import {Alert, ScrollView, Text, TouchableOpacity} from 'react-native';
 import Icon from '../../components/icon/icon.component';
 import moment from 'moment';
 import 'moment/locale/ru';
@@ -25,11 +25,8 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
   const [name, setName] = useState<string>(subscriptionData.title || '');
   const [description, setDescription] = useState<string>('');
   const [sum, setSum] = useState<string>('');
-  const [date, setDate] = useState<any>(new Date());
-  const [currency, setCurrency] = useState<any>({
-    label: 'Нажмите чтобы выбрать валюту',
-    value: null,
-  });
+  const [date, setDate] = useState<any>(undefined);
+  const [currency, setCurrency] = useState<any>();
   const [frequency, setFrequency] = useState<string>('');
   const [reminder, setReminder] = useState<string>('');
   const [showDate, setShowDate] = useState<boolean>(false);
@@ -100,7 +97,16 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
                 </Title>
               </>
             ) : null}
-            <Title style={styles.titleDate}>{moment(date).fromNow()}</Title>
+            {date ? (
+              <>
+                <Title style={styles.titleDate}>
+                  {' '}
+                  {moment(date).fromNow() === 'несколько секунд назад'
+                    ? 'сегодня'
+                    : moment(date).fromNow()}
+                </Title>
+              </>
+            ) : null}
           </S.SubscriptionView>
           <S.Input
             value={name || subscriptionData.title}
@@ -134,7 +140,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
                 justifyContent: 'center',
               },
             }}
-            onValueChange={(value) => setCurrency({value})}
+            onValueChange={(value) => setCurrency(value)}
             items={[
               {label: 'Российский рубль', value: '₽'},
               {label: 'Доллар США', value: '$'},
@@ -180,7 +186,9 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = ({
           <TouchableOpacity
             style={styles.dateInput}
             onPress={() => setShowDate(true)}>
-            <Text>{moment(date).format('M.D.YYYY')}</Text>
+            <Text>
+              {date ? moment(date).format('D MMMM YYYY') : 'Первый платёж'}
+            </Text>
           </TouchableOpacity>
           {showDate && (
             <DateTimePicker

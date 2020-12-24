@@ -30,17 +30,20 @@ import NewSubscriptionComponent from '../../screens/new-subscription-screen';
 import DataStorage from '../../utils/data-storage';
 import {useStore} from '../../store';
 import AsyncStorage from "@react-native-community/async-storage";
+import EditComponent from "../../screens/edit-screen";
 
 // Types
 export type RootStackParamList = {
   Home: undefined;
   Subscriptions: undefined;
   NewSubscription: undefined;
+  Edit: {id: number} | undefined;
 };
 
 export type HomeTabParamList = {
   Home: undefined;
   Subscriptions: undefined;
+  Edit: {id: number} | undefined;
 };
 
 const RootStack = createStackNavigator<RootStackParamList>();
@@ -49,6 +52,7 @@ const RootStack = createStackNavigator<RootStackParamList>();
 export type HomeStackParamList = {
   Home: undefined;
   Subscriptions: undefined;
+  Edit: {id: number} | undefined;
 };
 
 type HomeScreenRouteProp = RouteProp<HomeStackParamList, 'Home'>;
@@ -165,6 +169,20 @@ const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
           <RootStack.Screen
             name="NewSubscription"
             component={NewSubscriptionComponent}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: theme.colors.brandDark,
+              },
+              headerTitleStyle: {
+                color: theme.colors.brandWhite,
+              },
+              headerTintColor: theme.colors.brandWhite,
+            }}
+          />
+           <RootStack.Screen
+            name="Edit"
+            component={EditComponent}
             options={{
               headerShown: true,
               headerStyle: {
