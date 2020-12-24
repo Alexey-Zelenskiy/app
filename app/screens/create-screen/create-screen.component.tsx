@@ -1,39 +1,42 @@
 import React, {useCallback, useLayoutEffect, useState} from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {NewSubscriptionScreenProps} from '../../navigators/root-stack-navigator/root-stack-navigator.component';
+import {CreateScreenProps} from '../../navigators/root-stack-navigator/root-stack-navigator.component';
 import GS from '../../styles';
-import S, {styles} from './new-subscription-screen.styled';
+import S, {styles} from './create-screen.styled';
 import {useStore} from '../../store';
-import {Modal, Portal, Title} from 'react-native-paper';
+import {Title} from 'react-native-paper';
 import theme from '../../styles/theme';
-import {ScrollView, Text, TouchableOpacity} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import Icon from '../../components/icon/icon.component';
 import moment from 'moment';
 import 'moment/locale/ru';
 import RNPickerSelect from 'react-native-picker-select';
-import {observer} from 'mobx-react-lite';
+import {Modal, Portal} from 'react-native-paper';
 import {ColorPicker} from 'react-native-color-picker';
-import PushNotification from 'react-native-push-notification';
+import {observer} from 'mobx-react-lite';
 
-const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
-  ({navigation, route}) => {
+const CreateScreenComponent: React.FC<CreateScreenProps> = observer(
+  ({navigation}) => {
     const store = useStore();
-    const {id} = route.params ?? {id: undefined};
     // @ts-ignore
-    const subscriptionData = store.app.subscriptions[id];
-    const [color, setColor] = useState<string>(
-      subscriptionData.color || 'black',
-    );
+    const [color, setColor] = useState<string>('black');
+
+    const [visibleChangeColor, setVisible] = useState<boolean>(false);
+
+    const showModal = () => setVisible(true);
+    const hideModal = () => setVisible(false);
+
     const [favorite, setFavorite] = useState<boolean>(false);
 
     const onChangeFavorite = () => {
       setFavorite(!favorite);
     };
-    const [name, setName] = useState<string>(subscriptionData.title || '');
+
+    const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [sum, setSum] = useState<string>('');
     const [date, setDate] = useState<any>(undefined);
-    const [currency, setCurrency] = useState<any>();
+    const [currency, setCurrency] = useState<any>('');
     const [frequency, setFrequency] = useState<string>('');
     const [reminder, setReminder] = useState<string>('');
     const [showDate, setShowDate] = useState<boolean>(false);
@@ -56,10 +59,6 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
         frequency: frequency,
         favorite: favorite,
       });
-      PushNotification.localNotification({
-        message: name,
-        title: 'sssss',
-      });
       navigation.navigate('Home');
     }, [
       store.app,
@@ -71,34 +70,33 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
       reminder,
       color,
       frequency,
-      favorite,
       navigation,
+      favorite,
     ]);
+
     useLayoutEffect(() => {
       navigation.setOptions({
-        title: subscriptionData.title || 'Добавить подписку',
+        title: 'Моя подписка',
         headerRight: () => (
-          <>
+          <View style={{flexDirection: 'row'}}>
             <Icon
               name="check"
               size={20}
               color={theme.colors.brandWhite}
-              style={{marginRight: 10}}
+              style={{marginRight: 30}}
               onPress={addSubscription}
             />
-          </>
+          </View>
         ),
       });
-    }, [addSubscription, navigation, subscriptionData.title]);
-    const [visibleChangeColor, setVisible] = useState<boolean>(false);
+    }, [addSubscription, navigation]);
 
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
     const containerStyle = {
       backgroundColor: 'white',
       padding: 20,
-      height: 550,
+      height: 500,
     };
+
     return (
       <GS.SafeAreaView style={{backgroundColor: store.common.fonColor}}>
         <ScrollView>
@@ -118,7 +116,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
             <S.SubscriptionView
               onPress={showModal}
               style={{
-                backgroundColor: subscriptionData.color || color,
+                backgroundColor: color,
               }}>
               <Icon
                 name={favorite ? 'star' : 'star-o'}
@@ -129,7 +127,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               />
               <Title
                 style={{color: theme.colors.brandWhite, marginRight: 'auto'}}>
-                {name || subscriptionData.title}
+                {name}
               </Title>
               {sum.length > 0 ? (
                 <>
@@ -151,7 +149,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               ) : null}
             </S.SubscriptionView>
             <S.Input
-              value={name || subscriptionData.title}
+              value={name}
               placeholder={'Название'}
               onChangeText={(text: React.SetStateAction<string>) =>
                 setName(text)
@@ -165,6 +163,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               }
             />
             <RNPickerSelect
+              value={currency}
               placeholder={{label: 'Нажмите чтобы выбрать валюту'}}
               style={{
                 inputAndroid: {
@@ -200,6 +199,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               }
             />
             <RNPickerSelect
+              value={frequency}
               placeholder={{label: 'Частота платежей'}}
               style={{
                 inputAndroid: {
@@ -247,6 +247,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               />
             )}
             <RNPickerSelect
+              value={reminder}
               placeholder={{label: 'Напоминание'}}
               style={{
                 inputAndroid: {
@@ -284,4 +285,4 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
   },
 );
 
-export default NewSubscriptionComponent;
+export default CreateScreenComponent;

@@ -14,7 +14,7 @@ export const ScreenContent = styled.ScrollView`
 
 export const SafeAreaView = styled(SafeAreaViewLib)`
   flex: 1;
-  background-color: white;
+  background-color: #f1f1f1;
 `;
 
 export const PrimaryHeaderBlock = styled.View`

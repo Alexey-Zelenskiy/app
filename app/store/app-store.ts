@@ -1,4 +1,5 @@
 import {observable, action} from 'mobx';
+import DataStorage from '../utils/data-storage';
 
 class AppStore {
   @observable subscriptions: any[] = [
@@ -13,10 +14,40 @@ class AppStore {
     {id: 9, color: '#000000', title: 'Apple Music'},
   ];
 
-  @observable mySubscriptions: any[] | undefined;
+  @observable mySubscriptions: any[] = [];
+
+  @action async addMySubscriptions(data: any) {
+    if (data) {
+      this.setMySubscriptions([...this.mySubscriptions, data]);
+      await DataStorage.storeItem('@my_subscriptions', this.mySubscriptions);
+    }
+  }
+
+  @action async updateMySubscriptions(data: any) {
+    const updateData = this.mySubscriptions.map((item: any) => {
+      if (item.id === data.id) {
+        return {
+          ...item,
+          ...data,
+        };
+      } else {
+        return item;
+      }
+    });
+    this.setMySubscriptions(updateData);
+    await DataStorage.storeItem('@my_subscriptions', updateData);
+  }
+
+  @action async deleteMySubscriptions(idx: any) {
+    const updateData = this.mySubscriptions.filter(
+      (item: any) => idx !== item.id,
+    );
+    this.setMySubscriptions(updateData);
+    await DataStorage.storeItem('@my_subscriptions', updateData);
+  }
 
   @action setMySubscriptions(data: any) {
-    this.mySubscriptions?.push(data);
+    this.mySubscriptions = data;
   }
 
   constructor() {}

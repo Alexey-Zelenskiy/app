@@ -6,6 +6,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 // Styles
 import S from './custom-bottom-tab-bar.styled';
 import theme from '../../styles/theme';
+import {useStore} from '../../store';
 
 interface CustomBottomTabBarProps extends BottomTabBarProps {}
 
@@ -14,9 +15,11 @@ const CustomBottomTabBar: React.FC<CustomBottomTabBarProps> = ({
   descriptors,
   navigation,
 }) => {
+  const store = useStore();
   const {bottom} = useSafeAreaInsets();
   return (
-    <S.Container style={{paddingBottom: bottom}}>
+    <S.Container
+      style={{paddingBottom: bottom, backgroundColor: store.common.panelColor}}>
       {state.routes.map((route, index) => {
         const {options} = descriptors[route.key];
         const label =
