@@ -1,22 +1,21 @@
 import React, {useCallback, useRef} from 'react';
 import {observer} from 'mobx-react-lite';
 import {Title, IconButton, Colors} from 'react-native-paper';
-//Components
 
 // Navigators
 import {HomeScreenProps} from '../../navigators/root-stack-navigator/root-stack-navigator.component';
 
-// Store
-// import {useStore} from '~/store';
-
 //Styles
 import GS from '../../styles';
 import S, {styles} from './home-screen.styled';
+
 import {useStore} from '../../store';
 import {Dimensions, FlatList, View} from 'react-native';
 import moment from 'moment';
+import Icon from '../../components/icon/icon.component';
+import theme from '../../styles/theme';
 
-const DashboardScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
+const HomeScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
   const goToSubscriptions = useCallback(() => {
     navigation.navigate('Subscriptions');
   }, [navigation]);
@@ -27,7 +26,6 @@ const DashboardScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
     },
     [navigation],
   );
-
   const store = useStore();
 
   const listRef = useRef<FlatList>(null);
@@ -50,6 +48,14 @@ const DashboardScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
       <S.View
         style={{backgroundColor: item.color}}
         onPress={() => goToEdit(index)}>
+        {item.favorite && (
+          <Icon
+            name={'star'}
+            size={20}
+            color={theme.colors.brandWhite}
+            style={{marginRight: 10}}
+          />
+        )}
         <S.ViewTitle>{item.title}</S.ViewTitle>
         <Title style={styles.title}>
           Платёж{' '}
@@ -58,14 +64,15 @@ const DashboardScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
             : moment(item.date).fromNow()}
         </Title>
         <Title style={styles.titleSum}>
-          {item.sum}$ - {item.frequency}
+          {item.sum}$ {item.frequency ? `- ${item.frequency}` : ''}
         </Title>
       </S.View>
     ),
-    [],
+    [goToEdit],
   );
+
   return (
-    <GS.SafeAreaView>
+    <GS.SafeAreaView style={{backgroundColor: store.common.fonColor}}>
       <S.Container>
         {store.app.mySubscriptions?.length ? (
           <S.FlatList
@@ -99,4 +106,4 @@ const DashboardScreen: React.FC<HomeScreenProps> = observer(({navigation}) => {
   );
 });
 
-export default DashboardScreen;
+export default HomeScreen;

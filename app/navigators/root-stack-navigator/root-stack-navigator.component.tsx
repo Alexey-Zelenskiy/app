@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
+import React, {useState, useRef, useLayoutEffect} from 'react';
 import {observer} from 'mobx-react-lite';
 import {
   NavigationContainer,
@@ -14,23 +14,16 @@ import RNBootSplash from 'react-native-bootsplash';
 // Navigators
 import HomeTabNavigator from '../home-tab-navigator';
 
-//Components
-// import Loader from '~/components/loader';
-// import ChatAppBarMenu from '~/components/chat-app-bar-menu';
-// import ChatAppBarTitle from '~/components/chat-app-bar-title';
-// Store
-// import {useStore} from '~/store';
 
 // Styles
 import theme from '../../styles/theme';
+
 import SubscriptionsComponent from '../../screens/subscriptions-screen/subscriptions.component';
-import {Text} from 'react-native';
-import Icon from '../../components/icon/icon.component';
 import NewSubscriptionComponent from '../../screens/new-subscription-screen';
 import DataStorage from '../../utils/data-storage';
 import {useStore} from '../../store';
-import AsyncStorage from "@react-native-community/async-storage";
-import EditComponent from "../../screens/edit-screen";
+import EditComponent from '../../screens/edit-screen';
+import CreateScreenComponent from '../../screens/create-screen';
 
 // Types
 export type RootStackParamList = {
@@ -38,12 +31,14 @@ export type RootStackParamList = {
   Subscriptions: undefined;
   NewSubscription: undefined;
   Edit: {id: number} | undefined;
+  Create: undefined;
 };
 
 export type HomeTabParamList = {
   Home: undefined;
   Subscriptions: undefined;
   Edit: {id: number} | undefined;
+  Settings: undefined;
 };
 
 const RootStack = createStackNavigator<RootStackParamList>();
@@ -68,6 +63,7 @@ export type HomeScreenProps = {
 export type SubscriptionsStackParamList = {
   Home: undefined;
   Subscriptions: undefined;
+  Create: undefined;
   NewSubscription: {id: number} | undefined;
 };
 
@@ -106,6 +102,35 @@ export type NewSubscriptionScreenProps = {
   navigation: NewSubscriptionScreenNavigationProp;
 };
 
+export type EditScreenProps = {
+  route: EditScreenRouteProp;
+  navigation: EditScreenNavigationProp;
+};
+
+export type EditStackParamList = {
+  Edit: undefined;
+  Home: undefined;
+};
+
+type EditScreenRouteProp = RouteProp<EditStackParamList, 'Edit'>;
+type EditScreenNavigationProp = StackNavigationProp<EditStackParamList, 'Edit'>;
+
+export type CreateScreenProps = {
+  route: CreateScreenRouteProp;
+  navigation: CreateScreenNavigationProp;
+};
+
+export type CreateStackParamList = {
+  Create: undefined;
+  Home: undefined;
+};
+
+type CreateScreenRouteProp = RouteProp<CreateStackParamList, 'Create'>;
+type CreateScreenNavigationProp = StackNavigationProp<
+  CreateStackParamList,
+  'Create'
+>;
+
 interface RootStackNavigatorProps {}
 
 const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
@@ -140,15 +165,7 @@ const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
             name="Home"
             component={HomeTabNavigator}
             options={{
-              headerShown: true,
-              title: 'Мои подписки',
-              headerStyle: {
-                backgroundColor: theme.colors.brandDark,
-              },
-              headerTitleStyle: {
-                color: theme.colors.brandWhite,
-              },
-              headerTintColor: theme.colors.brandWhite,
+              headerShown: false,
             }}
           />
           <RootStack.Screen
@@ -157,7 +174,7 @@ const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
             options={{
               headerShown: true,
               headerStyle: {
-                backgroundColor: theme.colors.brandDark,
+                backgroundColor: store.common.panelColor,
               },
               headerTitleStyle: {
                 color: theme.colors.brandWhite,
@@ -172,7 +189,7 @@ const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
             options={{
               headerShown: true,
               headerStyle: {
-                backgroundColor: theme.colors.brandDark,
+                backgroundColor: store.common.panelColor,
               },
               headerTitleStyle: {
                 color: theme.colors.brandWhite,
@@ -180,13 +197,27 @@ const RootStackNavigator: React.FC<RootStackNavigatorProps> = observer(() => {
               headerTintColor: theme.colors.brandWhite,
             }}
           />
-           <RootStack.Screen
+          <RootStack.Screen
             name="Edit"
             component={EditComponent}
             options={{
               headerShown: true,
               headerStyle: {
-                backgroundColor: theme.colors.brandDark,
+                backgroundColor: store.common.panelColor,
+              },
+              headerTitleStyle: {
+                color: theme.colors.brandWhite,
+              },
+              headerTintColor: theme.colors.brandWhite,
+            }}
+          />
+          <RootStack.Screen
+            name="Create"
+            component={CreateScreenComponent}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: store.common.panelColor,
               },
               headerTitleStyle: {
                 color: theme.colors.brandWhite,

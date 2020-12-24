@@ -1,41 +1,54 @@
 import React, {useCallback, useLayoutEffect, useState} from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {NewSubscriptionScreenProps} from '../../navigators/root-stack-navigator/root-stack-navigator.component';
+import {EditScreenProps} from '../../navigators/root-stack-navigator/root-stack-navigator.component';
 import GS from '../../styles';
-import S, {styles} from './new-subscription-screen.styled';
+import S, {styles} from './edit-screen.styled';
 import {useStore} from '../../store';
-import {Modal, Portal, Title} from 'react-native-paper';
+import {Title} from 'react-native-paper';
 import theme from '../../styles/theme';
-import {ScrollView, Text, TouchableOpacity} from 'react-native';
+import {Alert, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import Icon from '../../components/icon/icon.component';
 import moment from 'moment';
 import 'moment/locale/ru';
 import RNPickerSelect from 'react-native-picker-select';
-import {observer} from 'mobx-react-lite';
+import {Modal, Portal} from 'react-native-paper';
 import {ColorPicker} from 'react-native-color-picker';
-import PushNotification from 'react-native-push-notification';
+import {observer} from 'mobx-react-lite';
 
-const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
+const EditScreenComponent: React.FC<EditScreenProps> = observer(
   ({navigation, route}) => {
     const store = useStore();
     const {id} = route.params ?? {id: undefined};
     // @ts-ignore
-    const subscriptionData = store.app.subscriptions[id];
-    const [color, setColor] = useState<string>(
-      subscriptionData.color || 'black',
-    );
+    const subscriptionData = store.app.mySubscriptions[id];
+    const [color, setColor] = useState<string>(subscriptionData.color);
+
+    const [visibleChangeColor, setVisible] = useState<boolean>(false);
+
+    const showModal = () => setVisible(true);
+    const hideModal = () => setVisible(false);
+
     const [favorite, setFavorite] = useState<boolean>(false);
 
     const onChangeFavorite = () => {
       setFavorite(!favorite);
     };
+
     const [name, setName] = useState<string>(subscriptionData.title || '');
-    const [description, setDescription] = useState<string>('');
-    const [sum, setSum] = useState<string>('');
-    const [date, setDate] = useState<any>(undefined);
-    const [currency, setCurrency] = useState<any>();
-    const [frequency, setFrequency] = useState<string>('');
-    const [reminder, setReminder] = useState<string>('');
+    const [description, setDescription] = useState<string>(
+      subscriptionData.description || '',
+    );
+    const [sum, setSum] = useState<string>(subscriptionData.sum || '');
+    const [date, setDate] = useState<any>(subscriptionData.date);
+    const [currency, setCurrency] = useState<any>(
+      subscriptionData.currency || '',
+    );
+    const [frequency, setFrequency] = useState<string>(
+      subscriptionData.frequency || '',
+    );
+    const [reminder, setReminder] = useState<string>(
+      subscriptionData.reminder || '',
+    );
     const [showDate, setShowDate] = useState<boolean>(false);
     const onChangeDate = (event: any, selectedValue: any) => {
       const currentDate = selectedValue || date;
@@ -44,8 +57,8 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
     };
 
     const addSubscription = useCallback(async () => {
-      await store.app.addMySubscriptions({
-        id: (Math.random().toString(16) + '00000000000000000').slice(2, 12 + 2),
+      await store.app.updateMySubscriptions({
+        id: subscriptionData.id,
         title: name,
         description: description,
         sum: sum,
@@ -56,13 +69,10 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
         frequency: frequency,
         favorite: favorite,
       });
-      PushNotification.localNotification({
-        message: name,
-        title: 'sssss',
-      });
       navigation.navigate('Home');
     }, [
       store.app,
+      subscriptionData,
       name,
       description,
       sum,
@@ -74,31 +84,60 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
       favorite,
       navigation,
     ]);
+
+    const deleteSubscription = useCallback(async () => {
+      await store.app.deleteMySubscriptions(subscriptionData.id);
+      navigation.navigate('Home');
+    }, [navigation, store.app, subscriptionData.id]);
+
+    const deleteAlert = useCallback(
+      () =>
+        Alert.alert(
+          'Delete',
+          'Вы действительно хотите удалить подписку?',
+          [
+            {
+              text: 'Отмена',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            {text: 'Да', onPress: () => deleteSubscription()},
+          ],
+          {cancelable: false},
+        ),
+      [deleteSubscription],
+    );
+
     useLayoutEffect(() => {
       navigation.setOptions({
-        title: subscriptionData.title || 'Добавить подписку',
+        title: subscriptionData.title || 'Моя подписка',
         headerRight: () => (
-          <>
+          <View style={{flexDirection: 'row'}}>
             <Icon
               name="check"
               size={20}
               color={theme.colors.brandWhite}
-              style={{marginRight: 10}}
+              style={{marginRight: 30}}
               onPress={addSubscription}
             />
-          </>
+            <Icon
+              name="trash"
+              size={20}
+              color={theme.colors.brandWhite}
+              style={{marginRight: 10}}
+              onPress={deleteAlert}
+            />
+          </View>
         ),
       });
-    }, [addSubscription, navigation, subscriptionData.title]);
-    const [visibleChangeColor, setVisible] = useState<boolean>(false);
+    }, [addSubscription, deleteAlert, navigation, subscriptionData.title]);
 
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
     const containerStyle = {
       backgroundColor: 'white',
       padding: 20,
-      height: 550,
+      height: 500,
     };
+
     return (
       <GS.SafeAreaView style={{backgroundColor: store.common.fonColor}}>
         <ScrollView>
@@ -118,7 +157,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
             <S.SubscriptionView
               onPress={showModal}
               style={{
-                backgroundColor: subscriptionData.color || color,
+                backgroundColor: color,
               }}>
               <Icon
                 name={favorite ? 'star' : 'star-o'}
@@ -151,7 +190,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               ) : null}
             </S.SubscriptionView>
             <S.Input
-              value={name || subscriptionData.title}
+              value={name}
               placeholder={'Название'}
               onChangeText={(text: React.SetStateAction<string>) =>
                 setName(text)
@@ -165,6 +204,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               }
             />
             <RNPickerSelect
+              value={currency}
               placeholder={{label: 'Нажмите чтобы выбрать валюту'}}
               style={{
                 inputAndroid: {
@@ -200,6 +240,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               }
             />
             <RNPickerSelect
+              value={frequency}
               placeholder={{label: 'Частота платежей'}}
               style={{
                 inputAndroid: {
@@ -247,6 +288,7 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
               />
             )}
             <RNPickerSelect
+              value={reminder}
               placeholder={{label: 'Напоминание'}}
               style={{
                 inputAndroid: {
@@ -284,4 +326,4 @@ const NewSubscriptionComponent: React.FC<NewSubscriptionScreenProps> = observer(
   },
 );
 
-export default NewSubscriptionComponent;
+export default EditScreenComponent;
